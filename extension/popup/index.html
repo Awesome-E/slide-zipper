@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slide Zipper</title>
+  <style>
+    html {
+      width: 250px;
+      background-color: #fbbc04;
+    }
+    body {
+      padding: 8px;
+      font-family: Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
+      text-align: center;
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+    }
+    .picker {
+      display: flex;
+      justify-content: space-evenly;
+    }
+    .picker-button {
+      background-image: none;
+      border-radius: 4px;
+      box-shadow: none;
+      box-sizing: border-box;
+      font-family: var(--docs-material-header-font-family, Roboto, RobotoDraft, Helvetica, Arial, sans-serif);
+      font-weight: var(--docs-material-font-weight-bold, 500);
+      font-size: 14px;
+      height: 36px;
+      letter-spacing: 0.25px;
+      line-height: 16px;
+      background-color: white;
+      border: 1px solid #dadce0!important;
+      color: #202124;
+      padding: 9px 11px 10px 12px;
+      cursor: pointer;
+      transition: all 150ms ease;
+    }
+    .picker-button:hover {
+      border: 1px solid #feedbc!important;
+      background-color: #fffdf6;
+    }
+    .picker-button:active {
+      background-color: #fff5d7;
+      box-shadow: 0 1px 3px 1px rgb(60 64 67 / 15%)
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 1.35em;
+    }
+    #progress-label {
+      font-size: 1.3em;
+    }
+    progress {
+      margin-bottom: 8px;
+      width: 80%;
+      height: 10px;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    progress::-webkit-progress-bar {
+      border-radius: 100px;
+      background-color: #fafafa;
+      overflow: hidden;
+    }
+    progress::-webkit-progress-value {
+      /* background-color: #3871E0; */
+      background-color: #333;
+      border-radius: 0px;
+      transition: 0.75s;
+    }
+    progress::-moz-progress-bar {
+      border-radius: 100px;
+      background-color: lightgray;
+      overflow: hidden;
+    }
+    progress::-moz-progress-value {
+      background-color: #3871E0;
+      border-radius: 0px;
+      transition: 0.75s;
+    }
+
+  </style>
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div id="picker" class="modal-dialog" tabindex="0" role="dialog">
+    <div class="modal-dialog-content">
+      <div>
+        <h1 class="picker-header" role="heading">Choose Export Format</h1>
+        <div class="picker">
+          <button class="picker-button" tabindex="0" aria-labelledby="svg" data-value="svg">SVG</button>
+          <button class="picker-button" tabindex="0" aria-labelledby="png" data-value="png">PNG</button>
+          <button class="picker-button" tabindex="0" aria-labelledby="jpeg" data-value="jpeg">JPEG</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="progress-container" style="display:none">
+    <progress></progress>
+    <br/>
+    <span id="progress-label"></span>
+  </div>
+</body>
+</html>
