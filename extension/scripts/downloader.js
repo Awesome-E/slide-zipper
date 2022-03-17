@@ -5,6 +5,7 @@ if (typeof browser !== 'undefined') api = browser
 
 let currentlyActive = false
 let lastUpdate = null
+const presentationId = location.href.match(/\/d\/([^/]+)/)[1]
 
 function sendUpdate (value, label) {
   if (value != null && label != null) lastUpdate = { value, label }
@@ -38,7 +39,7 @@ function download (format) {
       return
     }
     index++
-    fetch(`https://docs.google.com/presentation/d/1bnBP7zM5GhcEv1yLMisdAtGCGtPoD9IIX9ueBNCSJt0/export/${format}?id=1bnBP7zM5GhcEv1yLMisdAtGCGtPoD9IIX9ueBNCSJt0&pageid=${current}`).then(r => r.blob()).then(data => {
+    fetch(`https://docs.google.com/presentation/d/${presentationId}/export/${format}?id=${presentationId}&pageid=${current}`).then(r => r.blob()).then(data => {
       if (!currentlyActive) return
       // Add slide to ZIP
       zip.file(`slide${index}.${format}`, data)
