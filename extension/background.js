@@ -45,7 +45,10 @@ api.runtime.onMessage.addListener(async function (request, sender, sendResponse)
   }
 })
 
-chrome.windows.onFocusChanged.addListener(id => {
+api.windows.getCurrent(window => {
+  activeWindow = window.id
+})
+api.windows.onFocusChanged.addListener(id => {
   activeWindow = id
 })
 

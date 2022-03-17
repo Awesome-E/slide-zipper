@@ -33,6 +33,7 @@ function updateProgress (value, label) {
 api.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
   if (request.type !== 'progress-update') return
   const isFromActiveTab = sender.tab.windowId === activeWindow && sender.tab.active
+  console.log(sender.tab.windowId, activeWindow, sender.tab.active)
   if (!isFromActiveTab) return
   if (!request.data) {
     picker.style.display = 'block'
