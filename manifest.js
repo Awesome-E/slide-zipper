@@ -24,7 +24,7 @@ module.exports = function (isFF) {
   }
   if (isFF) manifest.browser_specific_settings = { gecko: { id: '{90bbe48f-041c-4953-a664-2bd5f4e647e4}' } }
   manifest[isFF ? 'browser_action' : 'action'] = {
-    default_title: 'Homebrew Finder',
+    default_title: 'Slide Zipper',
     default_icon: 'icons/pack-icon-inactive-64.png',
     default_popup: ''
   }

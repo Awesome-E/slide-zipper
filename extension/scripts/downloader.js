@@ -7,7 +7,7 @@ let currentlyActive = false
 let lastUpdate = null
 
 function sendUpdate (value, label) {
-  lastUpdate = { value, label }
+  if (value != null && label != null) lastUpdate = { value, label }
   api.runtime.sendMessage({
     type: 'progress-update',
     data: lastUpdate
@@ -23,11 +23,13 @@ function download (format) {
 
   function cycleDownload (list, index = 0) {
     const current = list[index]
+    if (!currentlyActive) return
     if (!current) {
       sendUpdate(index / list.length, 'Creating ZIP Archive')
       // Zipping files
       zip.generateAsync({ type: 'blob' })
         .then(content => {
+          if (!currentlyActive) return
           saveAs(content, `${document.title.replace(/ - Google Slides$/, '')}.zip`)
           currentlyActive = false
           lastUpdate = null
@@ -37,6 +39,7 @@ function download (format) {
     }
     index++
     fetch(`https://docs.google.com/presentation/d/1bnBP7zM5GhcEv1yLMisdAtGCGtPoD9IIX9ueBNCSJt0/export/${format}?id=1bnBP7zM5GhcEv1yLMisdAtGCGtPoD9IIX9ueBNCSJt0&pageid=${current}`).then(r => r.blob()).then(data => {
+      if (!currentlyActive) return
       // Add slide to ZIP
       zip.file(`slide${index}.${format}`, data)
       sendUpdate(index / list.length, `Downloading slides (${index}/${list.length})`)
@@ -49,6 +52,8 @@ function download (format) {
 }
 
 function init (format) {
+  if (document.readyState !== 'complete') return
+
   currentlyActive = true
 
   // Scroll to bottom of slides to load everything
@@ -62,6 +67,8 @@ function init (format) {
   setTimeout(() => download(format), 1000)
 }
 
+window.addEventListener('beforeunload', () => sendUpdate())
+
 api.runtime.sendMessage({ type: 'icon-set', data: 'pack-icon-48.png' }, () => {})
 api.runtime.onMessage.addListener((message, sender, sendResponse) => {
   switch (message.type) {
@@ -70,11 +77,14 @@ api.runtime.onMessage.addListener((message, sender, sendResponse) => {
       break
     }
     case 'get-progress': {
-      api.runtime.sendMessage({
-        type: 'progress-update',
-        data: lastUpdate
-      }, () => {})
+      sendUpdate()
       sendResponse('sending update...')
+      break
+    }
+    case 'cancel-download': {
+      currentlyActive = false
+      lastUpdate = null
+      sendUpdate()
       break
     }
   }

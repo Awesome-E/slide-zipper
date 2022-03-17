@@ -16,6 +16,12 @@ document.body.addEventListener('click', e => {
     downloadType: e.target.dataset.value
   }, () => {})
 })
+document.getElementById('progress-label').addEventListener('click', e => {
+  // Cancel Active Tab Download
+  api.runtime.sendMessage({
+    type: 'cancel-download'
+  }, () => {})
+})
 
 function updateProgress (value, label) {
   picker.style.display = 'none'

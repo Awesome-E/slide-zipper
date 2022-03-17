@@ -53,7 +53,18 @@
       font-size: 1.35em;
     }
     #progress-label {
-      font-size: 1.3em;
+      font-size: 15px;
+      display: block;
+      width: 100%;
+    }
+    #progress-label:hover {
+      font-size: 0;
+    }
+    #progress-label:hover::before {
+      content: "Cancel";
+      cursor: pointer;
+      text-decoration: underline;
+      font-size: 15px;
     }
     progress {
       margin-bottom: 8px;
