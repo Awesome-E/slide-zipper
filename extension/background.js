@@ -20,7 +20,7 @@ api.runtime.onMessage.addListener(async function (request, sender, sendResponse)
       api.tabs.query({ active: true, currentWindow: true }, tabs => {
         const tab = tabs[0]
         if (!tab) return
-        api.tabs.sendMessage(tab.id, { type: 'download', data: request.downloadType })
+        api.tabs.sendMessage(tab.id, { type: 'download', data: Object.assign({ format: request.downloadType }, request.options) })
       })
       sendResponse('forwarding to page')
       break

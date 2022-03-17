@@ -13,7 +13,8 @@ document.body.addEventListener('click', e => {
   if (!e.target.classList.contains('picker-button')) return
   api.runtime.sendMessage({
     type: 'conversion-request',
-    downloadType: e.target.dataset.value
+    downloadType: e.target.dataset.value,
+    options: { includeSkipped: document.querySelector('[name="include-skipped"]').checked }
   }, () => {})
 })
 document.getElementById('progress-label').addEventListener('click', e => {

@@ -15,11 +15,12 @@ function sendUpdate (value, label) {
   }, () => {})
 }
 
-function download (format) {
+function download (format, includeSkipped) {
   console.log(`Initiating ${format} download...`)
 
   // Get list of Slide IDs
   const slideIdList = [...document.querySelectorAll('.punch-filmstrip-thumbnail defs[cursor] + g[id*="filmstrip-slide"]')]
+    .filter(elm => includeSkipped || !elm.nextElementSibling) // If next element sibling exists, slide is hidden
     .map(x => x.id.replace(/^filmstrip-slide-\d+-/, ''))
 
   function cycleDownload (list, index = 0) {
@@ -52,7 +53,7 @@ function download (format) {
   cycleDownload(slideIdList)
 }
 
-function init (format) {
+function init (options) {
   if (document.readyState !== 'complete') return
 
   currentlyActive = true
@@ -65,7 +66,7 @@ function init (format) {
 
   sendUpdate(0, 'Starting Download')
 
-  setTimeout(() => download(format), 1000)
+  setTimeout(() => download(options.format, options.includeSkipped), 1000)
 }
 
 window.addEventListener('beforeunload', () => sendUpdate())
