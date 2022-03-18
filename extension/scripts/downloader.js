@@ -66,6 +66,14 @@ function init (options) {
 
   sendUpdate(0, 'Starting Download')
 
+  const firstLetter = options.format[0].toUpperCase()
+  const backgroundColors = {
+    S: '#139a0e',
+    P: '#d51d10',
+    J: '#5383ec'
+  }
+  api.runtime.sendMessage({ type: 'text-set', data: { text: firstLetter, color: '#fff', background: backgroundColors[firstLetter] } }, () => {})
+
   setTimeout(() => download(options.format, options.includeSkipped), 1000)
 }
 
@@ -86,6 +94,7 @@ api.runtime.onMessage.addListener((message, sender, sendResponse) => {
     case 'cancel-download': {
       currentlyActive = false
       lastUpdate = null
+      api.runtime.sendMessage({ type: 'text-set', data: { text: '', color: '#fff' } }, () => {})
       sendUpdate()
       break
     }
