@@ -4,6 +4,7 @@ if (typeof chrome !== 'undefined') api = chrome
 if (typeof browser !== 'undefined') api = browser
 
 let currentlyActive = false
+let currentExportId = null
 let lastUpdate = null
 const presentationId = location.href.match(/\/d\/([^/]+)/)[1]
 
@@ -15,7 +16,7 @@ function sendUpdate (value, label) {
   }, () => {})
 }
 
-function download (format, includeSkipped) {
+function download (id, format, includeSkipped) {
   console.log(`Initiating ${format} download...`)
 
   // Get list of Slide IDs
@@ -25,13 +26,13 @@ function download (format, includeSkipped) {
 
   function cycleDownload (list, index = 0) {
     const current = list[index]
-    if (!currentlyActive) return
+    if (!currentlyActive || currentExportId !== id) return
     if (!current) {
       sendUpdate(index / list.length, 'Creating ZIP Archive')
       // Zipping files
       zip.generateAsync({ type: 'blob' })
         .then(content => {
-          if (!currentlyActive) return
+          if (!currentlyActive || currentExportId !== id) return
           saveAs(content, `${document.title.replace(/ - Google Slides$/, '')}.zip`)
           currentlyActive = false
           lastUpdate = null
@@ -41,7 +42,7 @@ function download (format, includeSkipped) {
     }
     index++
     fetch(`https://docs.google.com/presentation/d/${presentationId}/export/${format}?id=${presentationId}&pageid=${current}`).then(r => r.blob()).then(data => {
-      if (!currentlyActive) return
+      if (!currentlyActive || currentExportId !== id) return
       // Add slide to ZIP
       zip.file(`slide${index}.${format}`, data)
       sendUpdate(index / list.length, `Downloading slides (${index}/${list.length})`)
@@ -56,6 +57,7 @@ function download (format, includeSkipped) {
 function init (options) {
   if (document.readyState !== 'complete') return
 
+  currentExportId = Date.now().toString(36)
   currentlyActive = true
 
   // Scroll to bottom of slides to load everything
@@ -74,7 +76,7 @@ function init (options) {
   }
   api.runtime.sendMessage({ type: 'text-set', data: { text: firstLetter, color: '#fff', background: backgroundColors[firstLetter] } }, () => {})
 
-  setTimeout(() => download(options.format, options.includeSkipped), 1000)
+  setTimeout(() => download(currentExportId, options.format, options.includeSkipped), 1000)
 }
 
 window.addEventListener('beforeunload', () => sendUpdate())
