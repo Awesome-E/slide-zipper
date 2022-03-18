@@ -4,7 +4,7 @@ module.exports = function (isFF) {
     description: 'A browser extension that allows you to download a ZIP file containing images of each slide in a Google Slides Presentation',
     version: '0.1',
     host_permissions: ['https://docs.google.com/'],
-    permissions: [],
+    permissions: ['storage'],
     web_accessible_resources: [],
     background: isFF ? { scripts: ['background.js'] } : { service_worker: 'background.js' },
     content_scripts: [

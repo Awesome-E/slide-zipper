@@ -10,11 +10,15 @@ const picker = document.getElementById('picker')
 const progress = document.getElementById('progress-container')
 
 document.body.addEventListener('click', e => {
+  // Remember if the box is checked
+  const includeSkipped = document.querySelector('[name="include-skipped"]').checked
+  chrome.storage.sync.set({ includeSkipped }, () => {})
+
   if (!e.target.classList.contains('picker-button')) return
   api.runtime.sendMessage({
     type: 'conversion-request',
     downloadType: e.target.dataset.value,
-    options: { includeSkipped: document.querySelector('[name="include-skipped"]').checked }
+    options: { includeSkipped }
   }, () => {})
 })
 document.getElementById('progress-label').addEventListener('click', e => {
@@ -49,4 +53,7 @@ api.runtime.sendMessage({
   type: 'get-progress'
 }, response => {
   activeWindow = response.activeWindow
+})
+chrome.storage.sync.get({ includeSkipped: false }, (data) => {
+  document.querySelector('[name="include-skipped"]').checked = data.includeSkipped
 })
