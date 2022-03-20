@@ -33,6 +33,7 @@ function download (id, format, includeSkipped) {
       zip.generateAsync({ type: 'blob' })
         .then(content => {
           if (!currentlyActive || currentExportId !== id) return
+          api.runtime.sendMessage({ type: 'text-set', data: { text: '', color: '#fff' } }, () => {})
           saveAs(content, `${document.title.replace(/ - Google Slides$/, '')}.zip`)
           currentlyActive = false
           lastUpdate = null
