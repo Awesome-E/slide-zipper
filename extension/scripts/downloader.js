@@ -54,6 +54,14 @@ function download (id, format, includeSkipped, matchList) {
       zip.file(`slide${index}.${format}`, await readAsBinaryString(data), { binary: true })
       sendUpdate(index / list.length, `Downloading slides (${index}/${list.length})`)
       cycleDownload(list, index)
+    }).catch(e => {
+      sendUpdate(0, 'Network Error')
+      return setTimeout(() => {
+        currentlyActive = false
+        lastUpdate = null
+        api.runtime.sendMessage({ type: 'text-set', data: { text: '', color: '#fff' } }, () => {})
+        sendUpdate()
+      }, 1000)
     })
   }
 
