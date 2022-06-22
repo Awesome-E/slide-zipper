@@ -38,7 +38,7 @@ api.runtime.onMessage.addListener(async function (request, sender, sendResponse)
         api.tabs.sendMessage(tab.id, { type: 'get-progress' })
       })
       sendResponse({ activeWindow })
-      break
+      return { activeWindow }
     }
     case 'cancel-download': {
       api.tabs.query({ active: true, currentWindow: true }, tabs => {

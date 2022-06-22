@@ -3,7 +3,6 @@ module.exports = function (isFF) {
     name: 'Slide Zipper',
     description: 'A browser extension that allows you to download a ZIP file containing images of each slide in a Google Slides Presentation',
     version: '0.1',
-    host_permissions: ['https://docs.google.com/'],
     permissions: ['storage'],
     web_accessible_resources: [],
     background: isFF ? { scripts: ['background.js'] } : { service_worker: 'background.js' },
@@ -22,7 +21,13 @@ module.exports = function (isFF) {
     manifest_version: isFF ? 2 : 3 // ,
     // options_page: './options/index.html'
   }
-  if (isFF) manifest.browser_specific_settings = { gecko: { id: '{90bbe48f-041c-4953-a664-2bd5f4e647e4}' } }
+  if (!isFF) {
+    manifest.host_permissions = ['https://docs.google.com/']
+  }
+  if (isFF) {
+    manifest.permissions.push('<all_urls>')
+    manifest.browser_specific_settings = { gecko: { id: '{90bbe48f-041c-4953-a664-2bd5f4e647e4}' } }
+  }
   manifest[isFF ? 'browser_action' : 'action'] = {
     default_title: 'Slide Zipper',
     default_icon: 'icons/pack-icon-inactive-64.png',

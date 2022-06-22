@@ -15,6 +15,15 @@ function sendUpdate (value, label) {
     data: lastUpdate
   }, () => {})
 }
+function readAsBinaryString (blob) {
+  return new Promise(resolve => {
+    const reader = new FileReader()
+    reader.onload = function (event) {
+      resolve(event.target.result)
+    }
+    reader.readAsBinaryString(blob)
+  })
+}
 
 function download (id, format, includeSkipped, matchList) {
   console.log(`Initiating ${format} download...`)
@@ -39,10 +48,10 @@ function download (id, format, includeSkipped, matchList) {
     }
     const currentId = current.id
     index++
-    fetch(`https://docs.google.com/presentation/d/${presentationId}/export/${format}?id=${presentationId}&pageid=${currentId}`).then(r => r.blob()).then(data => {
+    fetch(`https://docs.google.com/presentation/d/${presentationId}/export/${format}?id=${presentationId}&pageid=${currentId}`).then(r => r.blob()).then(async data => {
       if (!currentlyActive || currentExportId !== id) return
       // Add slide to ZIP
-      zip.file(`slide${index}.${format}`, data)
+      zip.file(`slide${index}.${format}`, await readAsBinaryString(data), { binary: true })
       sendUpdate(index / list.length, `Downloading slides (${index}/${list.length})`)
       cycleDownload(list, index)
     })
