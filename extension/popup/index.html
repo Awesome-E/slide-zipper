@@ -86,6 +86,12 @@
       height: 10px;
       appearance: none;
       -webkit-appearance: none;
+      /* Firefox reads these traits */
+      -moz-appearance: none;
+      border-radius: 100px;
+      background-color: #fafafa;
+      border: none;
+      overflow: hidden;
     }
     progress::-webkit-progress-bar {
       border-radius: 100px;
@@ -93,18 +99,14 @@
       overflow: hidden;
     }
     progress::-webkit-progress-value {
-      /* background-color: #3871E0; */
       background-color: #333;
       border-radius: 0px;
       transition: 0.75s;
     }
-    progress::-moz-progress-bar {
-      border-radius: 100px;
-      background-color: lightgray;
-      overflow: hidden;
-    }
-    progress::-moz-progress-value {
-      background-color: #3871E0;
+    ::-moz-progress-bar {
+      appearance: none;
+      -moz-appearance: none;
+      background-color: #333;
       border-radius: 0px;
       transition: 0.75s;
     }
