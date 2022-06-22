@@ -16,13 +16,9 @@ function sendUpdate (value, label) {
   }, () => {})
 }
 
-function download (id, format, includeSkipped) {
+function download (id, format, includeSkipped, matchList) {
   console.log(`Initiating ${format} download...`)
-
-  // Get list of Slide IDs
-  const slideIdList = [...document.querySelectorAll('.punch-filmstrip-thumbnail defs[cursor] + g[id*="filmstrip-slide"]')]
-    .filter(elm => includeSkipped || !elm.nextElementSibling) // If next element sibling exists, slide is hidden
-    .map(x => x.id.replace(/^filmstrip-slide-\d+-/, ''))
+  const slideList = matchList.filter(slide => includeSkipped || !slide.skip)
 
   function cycleDownload (list, index = 0) {
     const current = list[index]
@@ -41,8 +37,9 @@ function download (id, format, includeSkipped) {
         })
       return
     }
+    const currentId = current.id
     index++
-    fetch(`https://docs.google.com/presentation/d/${presentationId}/export/${format}?id=${presentationId}&pageid=${current}`).then(r => r.blob()).then(data => {
+    fetch(`https://docs.google.com/presentation/d/${presentationId}/export/${format}?id=${presentationId}&pageid=${currentId}`).then(r => r.blob()).then(data => {
       if (!currentlyActive || currentExportId !== id) return
       // Add slide to ZIP
       zip.file(`slide${index}.${format}`, data)
@@ -52,7 +49,7 @@ function download (id, format, includeSkipped) {
   }
 
   const zip = new JSZip()
-  cycleDownload(slideIdList)
+  cycleDownload(slideList)
 }
 
 function init (options) {
@@ -60,12 +57,6 @@ function init (options) {
 
   currentExportId = Date.now().toString(36)
   currentlyActive = true
-
-  // Scroll to bottom of slides to load everything
-  const containerParent = document.querySelector('.punch-filmstrip-scroll')
-  const pickerContainer = containerParent.querySelector('svg.punch-filmstrip-thumbnails')
-  const height = parseInt(pickerContainer.getAttribute('height'))
-  containerParent.scrollTo(0, height)
 
   sendUpdate(0, 'Starting Download')
 
@@ -77,7 +68,33 @@ function init (options) {
   }
   api.runtime.sendMessage({ type: 'text-set', data: { text: firstLetter, color: '#fff', background: backgroundColors[firstLetter] } }, () => {})
 
-  setTimeout(() => download(currentExportId, options.format, options.includeSkipped), 1000)
+  const errors = []
+  fetch(`https://docs.google.com/presentation/d/${presentationId}/edit`).then(r => r.text()).then(data => {
+    const idMatcher = '(p|g[a-zA-Z0-9_]{8,25})(?=:notes)'
+    const expression = new RegExp(`DOCS_modelChunk\\s=\\s?\\[(?:.(?!;\\s?DOCS))*${idMatcher}(?:.(?!;\\s?DOCS))*\\]`, 'g')
+    const matches = data.match(expression).map(instance => {
+      const id = instance.match(new RegExp(idMatcher, 'g'))[0]
+      try {
+        const data = JSON.parse(instance.replace(/^DOCS_modelChunk\s?=\s?/, ''))
+        const slideMetadata = data.find(item => item[1] === id)
+        const skippedSlide = slideMetadata[4][5] === 0
+        return { id, data, skip: skippedSlide }
+      } catch (e) {
+        errors.push(e)
+        return { id, data: instance }
+      }
+    })
+    if (errors.length > 0) {
+      sendUpdate(0, 'Error!')
+      return setTimeout(() => {
+        currentlyActive = false
+        lastUpdate = null
+        api.runtime.sendMessage({ type: 'text-set', data: { text: '', color: '#fff' } }, () => {})
+        sendUpdate()
+      }, 1000)
+    }
+    download(currentExportId, options.format, options.includeSkipped, matches)
+  })
 }
 
 window.addEventListener('beforeunload', () => sendUpdate())
