@@ -36,14 +36,14 @@ function updateProgress (value, label) {
 }
 
 api.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
-  if (request.type !== 'progress-update') return
+  if (request.type !== 'progress-update') return sendResponse('[popup] Unable to handle request type')
   const isFromActiveTab = sender.tab.windowId === activeWindow && sender.tab.active
   console.log(sender.tab.windowId, activeWindow, sender.tab.active)
-  if (!isFromActiveTab) return
+  if (!isFromActiveTab) return sendResponse('[popup] Not from active tab')
   if (!request.data) {
     picker.style.display = 'block'
     progress.style.display = 'none'
-    return
+    return sendResponse('ok')
   }
   updateProgress(request.data.value, request.data.label)
   sendResponse('received')
