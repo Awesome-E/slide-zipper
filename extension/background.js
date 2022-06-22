@@ -18,7 +18,7 @@ api.runtime.onMessage.addListener(async function (request, sender, sendResponse)
     }
     case 'text-set': {
       api[browserAction].setBadgeText({ tabId: sender.tab.id, text: request.data.text })
-      api[browserAction].setBadgeBackgroundColor({ tabId: sender.tab.id, color: request.data.background })
+      if (request.data.background) api[browserAction].setBadgeBackgroundColor({ tabId: sender.tab.id, color: request.data.background })
       sendResponse('success')
       break
     }
