@@ -87,7 +87,7 @@ function init (options) {
 
   const errors = []
   fetch(`https://docs.google.com/presentation/d/${presentationId}/edit`).then(r => r.text()).then(data => {
-    const idMatcher = '(p|g[a-zA-Z0-9_]{8,25})(?=:notes)'
+    const idMatcher = '(p\\d{0,5}|g[a-zA-Z0-9_]{8,25})(?=:notes)'
     const expression = new RegExp(`DOCS_modelChunk\\s=\\s?\\[(?:.(?!;\\s?DOCS))*${idMatcher}(?:.(?!;\\s?DOCS))*\\]`, 'g')
     const matches = data.match(expression).map(instance => {
       const id = instance.match(new RegExp(idMatcher, 'g'))[0]

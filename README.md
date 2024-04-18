@@ -1,4 +1,4 @@
-# Slide Zipper
+# <img src="extension/icons/pack-icon-32.png" width="32"> Slide Zipper
 
 Simple-to-use ZIP creator for Google Slides. Automatically create ZIP files of SVGs, PNGs, and JPEGs for slides in your presentation!
 
